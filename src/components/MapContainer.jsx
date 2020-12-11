@@ -1,5 +1,6 @@
 import React from 'react';
-import {Map, InfoWindow, Marker, GoogleApiWrapper} from 'google-maps-react';
+import {Map, Circle, Marker, GoogleApiWrapper} from 'google-maps-react';
+import { v4 as uuidv4 } from 'uuid';
 
 export class MapContainer extends React.Component {
 
@@ -138,8 +139,13 @@ export class MapContainer extends React.Component {
         }
     }
 
+  onClick = () => {
+    this.getDirections(['UCSD', 'Old Town', 'Sunset Cliffs', 'UCSD']);
+  }
+
   render() {
-    return (
+    return <div>
+      <button onClick={this.onClick}>Calculate</button>
       <Map
         style={{
           width: '100%',
@@ -151,12 +157,49 @@ export class MapContainer extends React.Component {
           lat: 32.88006,
           lng: -117.23401
         }}>
-        {this.state.locations.map(location => <Marker name={location.name} position={location.coordinate} />)}
-
+        {this.state.locations.map(location => <Marker key={location.name} name={location.name} position={location.coordinate} />)}
+        {this.state.directions && this.state.directions.routes[0].overview_path.map(place => {
+          return <Circle key={uuidv4()} radius={400} strokeColor='transparent' fillColor='#0000FF' center={place} ></Circle>
+        })}
       </Map>
+    </div>;
+  }
+
+  getDirections = (routes) => {
+    const waypoints = routes.map(route => {
+      let place = this.state.locations.find(p => p.name === route);
+
+      return {
+        location: place.coordinate,
+        stopover: true
+      };
+    })
+    const origin = waypoints.shift().location;
+    const destination = waypoints.pop().location;
+
+    const directionsService = new this.props.google.maps.DirectionsService();
+    directionsService.route(
+      {
+        origin: origin,
+        destination: destination,
+        travelMode: 'DRIVING',
+        waypoints: waypoints
+      },
+      (result, status) => {
+        if (status === this.props.google.maps.DirectionsStatus.OK) {
+          console.log(result);
+          this.setState({
+            directions: result
+          });
+        } else {
+          this.setState({ directions: null });
+        }
+      }
     );
   }
+
 }
+
 
 export default GoogleApiWrapper({
   apiKey: ('AIzaSyA7d4cFSeA6OtEFYNhrRR7n5nfgCem7yxQ')
