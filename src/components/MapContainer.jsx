@@ -1,6 +1,6 @@
 import React, {Fragment} from 'react';
 import { Map, Polyline, Marker, GoogleApiWrapper, InfoWindow } from 'google-maps-react';
-import { v4 as uuidv4 } from 'uuid';
+import backtracking from '../algorithm/Backtracking';
 import StarRatingComponent from 'react-star-rating-component';
 import ReactDOM from "react-dom";
 
@@ -12,7 +12,7 @@ export class MapContainer extends React.Component {
         this.state = {
             activeMarker: null,
             activePlace: null,
-            cost: 480,
+            cost: 240,
             locations: [
                 {
                   name: 'UCSD',
@@ -202,11 +202,12 @@ export class MapContainer extends React.Component {
   }
 
   onButtonClick = async function(self) {
-    // let routes = await self.getRoutes(self);
     self.getDistanceMatrix(self).then(distanceMatrix => {
       console.log(distanceMatrix);
-      let routes = ['UCSD', 'Old Town', 'Sunset Cliffs', 'UCSD'];
-      self.getDirections(self, routes);
+      self.getRoutes(self).then(routes => {
+        self.getDirections(self, routes);
+      });
+      // let routes = ['UCSD', 'Old Town', 'Sunset Cliffs', 'UCSD'];
     }).catch(error => {
       console.log(error);
     });
@@ -337,13 +338,19 @@ export class MapContainer extends React.Component {
   }
 
   async getRoutes(self) {
-
+    const locations = self.state.locations;
+    const budget = self.state.cost;
+    const distanceMatrix = await self.getDistanceMatrix(self);
+    const result = await backtracking(locations, budget, distanceMatrix);
+    return result.map(p => locations[p].name).concat([locations[0].name]);
   }
 
   async getDirections(self, routes) {
     const waypoints = routes.map(route => {
       let place = self.state.locations.find(p => p.name === route);
-
+      if (place === undefined) {
+        console.log(routes);
+      }
       return {
         location: place.coordinate,
         stopover: true
