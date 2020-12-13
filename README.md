@@ -4,6 +4,8 @@
 
 The demo app is deployed [here](https://cse202.herokuapp.com/).
 
+![Demo page](demo.png)
+
 There are 25 places in San Diego County, each with a preference star.
 You can rate each place by clicking the marker.
 Then, enter a time budget and click `Calculate`.
