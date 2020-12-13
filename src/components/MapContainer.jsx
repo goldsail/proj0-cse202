@@ -208,6 +208,7 @@ export class MapContainer extends React.Component {
     })
   }
 
+  // https://stackoverflow.com/questions/2217267/click-event-in-google-map-infowindow-not-caught
   onInfoWindowOpen = () => {
     const div = (<Fragment>
       {this.state.activePlace ? <h2>{this.state.activePlace.name}</h2> : <div/>}
