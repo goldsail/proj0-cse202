@@ -1,5 +1,5 @@
 import React from 'react';
-import {Map, Circle, Marker, GoogleApiWrapper} from 'google-maps-react';
+import {Map, Polyline, Marker, GoogleApiWrapper} from 'google-maps-react';
 import { v4 as uuidv4 } from 'uuid';
 
 export class MapContainer extends React.Component {
@@ -158,9 +158,12 @@ export class MapContainer extends React.Component {
           lng: -117.23401
         }}>
         {this.state.locations.map(location => <Marker key={location.name} name={location.name} position={location.coordinate} />)}
-        {this.state.directions && this.state.directions.routes[0].overview_path.map(place => {
-          return <Circle key={uuidv4()} radius={400} strokeColor='transparent' fillColor='#0000FF' center={place} ></Circle>
-        })}
+        {this.state.directions && <Polyline
+          path={this.state.directions.routes[0].overview_path}
+          strokeColor="#0000FF"
+          strokeOpacity={0.8}
+          strokeWeight={2}
+        />}
       </Map>
     </div>;
   }
