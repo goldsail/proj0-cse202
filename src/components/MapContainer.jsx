@@ -12,6 +12,7 @@ export class MapContainer extends React.Component {
         this.state = {
             activeMarker: null,
             activePlace: null,
+            cost: 240,
             locations: [
                 {
                   name: 'UCSD',
@@ -225,7 +226,13 @@ export class MapContainer extends React.Component {
 
   render() {
     return <div>
-      <input/>
+
+      <div>
+        Total Time (minutes):
+        <input type="number" name="cost"
+          value={this.state.cost}
+          onChange={e => {this.setState({cost: e.target.value})}}/>
+      </div>
       <button onClick={this.onClick}>Calculate</button>
       <Map
         style={{
